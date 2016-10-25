@@ -49,10 +49,10 @@ int main(void)
 				printf("Kill ptest program\n");
 				if(pid != 0)
 					kill(pid, SIGKILL);
-				pid = -2;
+				pid = 0;
 				break;
 			case 'S' : case 's':
-				if(pid >= 0)
+				if(pid > 0)
 					printf("Still running\n");
 				else{
 					printf("ptest execute\n");
@@ -60,7 +60,7 @@ int main(void)
 				}
 				break;
 			case 'R' : case 'r':
-				if(pid < 0)
+				if(pid > 0)
 					printf("Re-start\n");
 				else{
 					kill(pid, SIGKILL);
