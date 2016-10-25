@@ -22,8 +22,7 @@ int main(void)
 	
 	pid = fork();
 	
-	if(pid == -1)
-	{
+	if(pid == -1){
 		printf("fork failed\n");
 		exit(1);
 	}
@@ -60,11 +59,11 @@ int main(void)
 				}
 				break;
 			case 'R' : case 'r':
-				if(pid < 0)
+				if(pid <= 0)
 					printf("Re-start\n");
 				else{
 					kill(pid, SIGKILL);
-					pid = 0;
+					pid = -2;
 				}
 				pid = getPid(pid, "ptest");
 				break;
