@@ -11,7 +11,7 @@ pid_t getPid(pid_t pid, char* arg)
 	if(pid == -1)		// fork failed
 		exit(1);
 	if(pid == 0)
-		execl(path, arg, NULL, NULL);
+		execl(path, arg, NULL, (char *)0);
 	return pid;
 }
 
@@ -28,7 +28,7 @@ int main(void)
 		exit(1);
 	}
 	else if(pid == 0)
-		execl(path, "ptest", NULL, NULL);
+		execl(path, "ptest", NULL, (char *)0);
 	
 	else{
 		while(1){
@@ -60,7 +60,7 @@ int main(void)
 				}
 				break;
 			case 'R' : case 'r':
-				if(pid > 0)
+				if(pid < 0)
 					printf("Re-start\n");
 				else{
 					kill(pid, SIGKILL);
