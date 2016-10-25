@@ -21,8 +21,7 @@ int main(void)
 	char message;
 	
 	pid = fork();
-	printf("%d", pid);
-	sleep(5);
+	
 	if(pid == -1)
 	{
 		printf("fork failed\n");
@@ -69,9 +68,8 @@ int main(void)
 				}
 				pid = getPid(pid, "ptest");
 				break;
-			}
-			//printf("%d\n", pid);
-			
+			}//switch
+			sleep(5);
 		}// while
 	}// default
 	exit(0);
