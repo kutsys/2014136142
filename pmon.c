@@ -55,7 +55,7 @@ int main(void)
 				if(pid > 0)
 					printf("Still running\n");
 				else{
-					printf("ptest execute\n");
+					printf("Now ptest is running\n");
 					pid = getPid(pid, "ptest");
 				}
 				break;
@@ -64,7 +64,7 @@ int main(void)
 					printf("Re-start\n");
 				else{
 					kill(pid, SIGKILL);
-					pid = -2;
+					pid = 0;
 				}
 				pid = getPid(pid, "ptest");
 				break;
