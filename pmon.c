@@ -14,14 +14,17 @@ pid_t getPid(pid_t pid, char* arg)
 		execl(path, arg, NULL, (char *)0);
 	return pid;
 }
-
+void printFunc(int pid)
+{
+	if(pid != 0) printf("running\n");
+	else printf("not existed\n");
+	alarm(5);			
+}
 int main(void)
 {
 	pid_t pid;
 	char message;
-	
 	pid = fork();
-	
 	if(pid == -1){
 		printf("fork failed\n");
 		exit(1);
@@ -30,13 +33,13 @@ int main(void)
 		execl(path, "ptest", NULL, (char *)0);
 	
 	else{
+		(void) signal(SIGALRM,printFunc);
+		alarm(5);
+	
 		while(1){
-
-			if(pid != 0) printf("\nrunning\n");
-			else printf("\nnon existed\n");
-			
-			printf(">>");
+			//printf(">>");
 			scanf("%c", &message);
+			
 			
 			switch(message){
 			case 'Q' : case 'q':
@@ -68,8 +71,10 @@ int main(void)
 				pid = getPid(pid, "ptest");
 				break;
 			}//switch
-			sleep(5);
+			printf("%d\n", pid);
+			//sleep(5);
 		}// while
 	}// default
 	exit(0);
 }
+
