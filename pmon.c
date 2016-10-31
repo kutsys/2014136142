@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-const char *path = "/home/user/Lab06/ptest";
+const char *path = "/home/user/2014136142/ptest";
 
 pid_t getPid(pid_t pid, char* arg)
 {	
