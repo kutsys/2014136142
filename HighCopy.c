@@ -1,30 +1,29 @@
 #include<stdio.h>
 #include<stdlib.h>
-
 int main()
 {
-	int nread;
 	FILE *in, *out;
-
+	char buf[BUFSIZ];
+	int nread;
 	int count = 0;
 	int printDot = 0;
+	printf("BUFSIZ : %d\n", BUFSIZ);
 
 	in = fopen("file.in","r");
-	if(in == -1){
+	if(in == NULL){
 		printf("No File in this Directory.\n");
 		exit(1);
 	}
-	out = fopen("file2.out","w");
+
+	out = fopen("file.out","w");
 
 	while((nread = fgetc(in)) != EOF){
 		fputc(nread, out);
-		printf(".");
-		printDot++;
+		count++;
+		if(count%BUFSIZ == 0){ printf("."); printDot++; }
 	}
-
 	printf("\nCopy is Finished\n");
 	printf("DOT : %d", printDot);
-
 	fclose(in);
 	fclose(out);
 	exit(0);
