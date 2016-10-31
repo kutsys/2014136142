@@ -5,22 +5,21 @@
 #include<stdio.h>
 int main()
 {
-	char block[1024];
+	char c;
 	int in, out;
-	int nread;
-	int count = 0;
 	int printDot = 0;
 
 	in = open("file.in",O_RDONLY);
-	out = open("file.out",O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR);
+	if(in == -1){
+		printf("No File in this Directory.\n");
+		exit(1);
+	}
+	out = open("file3.out",O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR);
 
-	while((nread = read(in,block,sizeof(block))) > 0){
-		write(out,block,nread);
-		count++;
-		if(count % 1024 == 0){
-			 printf(".");
-			printDot++;
-		}
+	while(read(in, &c, 1) == 1){
+		write(out,&c,1);
+		printf(".");
+		printDot++;
 	}
 	printf("\nCopy is Finished.\n");
 	printf("\nDOT : %d", printDot);
