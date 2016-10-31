@@ -14,7 +14,7 @@ int main()
 		printf("No File in this Directory.\n");
 		exit(1);
 	}
-	out = open("file3.out",O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR);
+	out = open("file.out",O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR);
 
 	while(read(in, &c, 1) == 1){
 		write(out,&c,1);
