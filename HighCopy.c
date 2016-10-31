@@ -3,7 +3,6 @@
 int main()
 {
 	FILE *in, *out;
-	char buf[BUFSIZ];
 	int nread;
 	int count = 0;
 	int printDot = 0;
@@ -14,7 +13,6 @@ int main()
 		printf("No File in this Directory.\n");
 		exit(1);
 	}
-
 	out = fopen("file.out","w");
 
 	while((nread = fgetc(in)) != EOF){
