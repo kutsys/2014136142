@@ -43,14 +43,17 @@ int main(void)
 			
 			switch(message){
 			case 'Q' : case 'q':
-				printf("Quit pmon program\n");
-				if(pid != 0)
+				if(pid != 0){
+					printf("Quit ptest program\n");
 					kill(pid, SIGKILL);
+				}
+				printf("Quit pmon program\n");
 				exit(1);
 			case 'K' : case 'k':
-				printf("Kill ptest program\n");
-				if(pid != 0)
+				if(pid != 0){
+					printf("Kill ptest program\n");
 					kill(pid, SIGKILL);
+				}
 				pid = 0;
 				break;
 			case 'S' : case 's':
@@ -77,4 +80,3 @@ int main(void)
 	}// default
 	exit(0);
 }
-
