@@ -14,7 +14,7 @@ void checkFunc(int sig){
 			printf("Failed!\n");
 		if(fgets(gpid, 10, fp) != NULL){
 			printf("PID : %s", gpid);
-			isRunning = true;// if ID is exist, still running
+			isRunning = true;
 			printf("running\n");
 		}
 		else
