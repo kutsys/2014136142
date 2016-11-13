@@ -2,81 +2,77 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-const char *path = "/home/cej/2014136142/ptest";
+bool isRunning;
+char gpid[10];
 
-pid_t getPid(pid_t pid, char* arg)
-{	
-	pid = fork();
-	if(pid == -1)		// fork failed
-		exit(1);
-	if(pid == 0)
-		execl(path, arg, NULL, (char *)0);
-	return pid;
+void checkFunc(int sig){
+	if(sig == SIGALRM){
+		FILE *fp = NULL;
+		if((fp = popen("pgrep -x ptest", "r")) == NULL)
+			printf("Failed!\n");
+		if(fgets(gpid, 10, fp) != NULL){
+			printf("PID : %s", gpid);
+			isRunning = true;// if ID is exist, still running
+			printf("running\n");
+		}
+		else
+			printf("not existed\n");
+		pclose(fp);
+	}
+	alarm(5);
 }
-void printFunc(int pid)
-{
-	if(pid != 0) printf("running\n");
-	else printf("not existed\n");
-	alarm(5);			
-}
+
 int main(void)
 {
-	pid_t pid;
+	isRunning = false;
 	char message;
-	pid = fork();
-	if(pid == -1){
-		printf("fork failed\n");
-		exit(1);
-	}
-	else if(pid == 0)
-		execl(path, "ptest", NULL, (char *)0);
+	(void)signal(SIGALRM, checkFunc);
+	alarm(5);
 	
-	else{
-		(void) signal(SIGALRM,printFunc);
-		alarm(5);
-	
-		while(1){
-			//printf(">>");
-			scanf("%c", &message);
-			
-			
-			switch(message){
-			case 'Q' : case 'q':
-				if(pid != 0){
-					printf("Quit ptest program\n");
-					kill(pid, SIGKILL);
-				}
-				printf("Quit pmon program\n");
-				exit(1);
-			case 'K' : case 'k':
-				if(pid != 0){
-					printf("Kill ptest program\n");
-					kill(pid, SIGKILL);
-				}
-				pid = 0;
-				break;
-			case 'S' : case 's':
-				if(pid > 0)
-					printf("Still running\n");
-				else{
-					printf("Now ptest is running\n");
-					pid = getPid(pid, "ptest");
-				}
-				break;
-			case 'R' : case 'r':
-				if(pid <= 0)
-					printf("Re-start\n");
-				else{
-					kill(pid, SIGKILL);
-					pid = -2;
-				}
-				pid = getPid(pid, "ptest");
-				break;
-			}//switch
-			printf("%d\n", pid);
-			//sleep(5);
-		}// while
-	}// default
+	while(1){
+		scanf("%c", &message);
+		switch(message){
+		case 'Q' : case 'q':
+			if(isRunning){
+				printf("Kill ptest program\n");
+				kill(atoi(gpid), SIGKILL);
+				isRunning = false;
+			}
+			printf("Quit pmon program\n");
+			exit(1);
+		case 'K' : case 'k':
+			if(isRunning){
+				printf("Kill ptest program\n");
+				kill(atoi(gpid), SIGKILL);
+			}
+			else
+				printf("ptest is not existed\n");	
+			isRunning = false;
+			break;
+		case 'S' : case 's':
+			if(isRunning)
+				printf("Still running\n");
+			else{
+				printf("Now ptest is running\n");
+				system("gnome-terminal --command \"./ptest\"");
+				isRunning = true;
+			}	
+			break;
+		case 'R' : case 'r':
+			if(isRunning){
+				printf("Re-start\n");
+				kill(atoi(gpid), SIGKILL);
+				system("gnome-terminal --command \"./ptest\"");
+			}
+			else{
+				printf("Still running\n");
+				system("gnome-terminal --command \"./ptest\"");
+			}
+			isRunning = true;
+			break;
+		}//switch
+	}// while
 	exit(0);
 }
