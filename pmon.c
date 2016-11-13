@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
-bool isRunning;
 pid_t pid = -1;
 void checkFunc(char* pname){
 	FILE *fp;
