@@ -22,10 +22,11 @@ int main(void)
 			exit(1);
 		}
 		else if(pid == 0){
-			execl(path, "subproc", NULL, (char *)0);  
+			execl(path, "subproc", NULL, (char *)0); 
 		}
 		else{	
-			pArr[i] = pid;	
+			pArr[i] = pid;
+			sleep(1);	
 		}
 	}
 	// 호출 완료
@@ -38,4 +39,3 @@ int main(void)
 	printf("Finished (proces)\n");
 	exit(0);
 }
-
