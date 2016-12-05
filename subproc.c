@@ -20,7 +20,7 @@ void test_funct(time_t org_time)
 int main()
 {
 	time_t the_time;
-	srand(getpid());
+	srand(time(NULL));
 	while(1)
 	{
 		int r = rand()%10;
