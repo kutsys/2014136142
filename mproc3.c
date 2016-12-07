@@ -95,7 +95,7 @@ void *thread_function(void *arg)
 			sleep(r);
 		}
 		else	sem_post(&bin_sem);
-		if(a_tid[id] == 3)
+		if(a_tid[id] == 20)
 		{
 			printf("Thread %2d is Finished\n", id+1);
 			pthread_exit(NULL);
