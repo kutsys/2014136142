@@ -9,7 +9,6 @@ void *thread_function(void *arg);
 sem_t bin_sem;
 
 int a_tid[10];
-int min = 1000000;
 
 int main()
 {
@@ -60,8 +59,8 @@ int main()
 int getMin()
 {
 	int i;
-	int min = a_tid[0];
-	for(i=1; i<10; i++)
+	int min = 100;
+	for(i=0; i<10; i++)
 	{
 		if(a_tid[i] < min) 
 			min = a_tid[i];
