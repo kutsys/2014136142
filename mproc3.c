@@ -42,13 +42,12 @@ int main()
 	
 	sem_post(&bin_sem);	// 세마포어 값을 1 증가
 
-	for(i=9; i>=0; i++)
+	for(i=9; i>=0; i--)
 	{
 		res = pthread_join(a_thread[i], &thread_result);
 		// 쓰레드 종료를 기다림
 		if(res != 0){
 			perror("Thread join failed");
-			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -61,10 +60,10 @@ int main()
 int getMin()
 {
 	int i;
-	int min;
-	for(i=0; i<10; i++)
+	int min = a_tid[0];
+	for(i=1; i<10; i++)
 	{
-		if(a_tid[i] <= min)
+		if(a_tid[i] < min) 
 			min = a_tid[i];
 	}
 	return min;
@@ -88,14 +87,15 @@ void *thread_function(void *arg)
 
 			printf("TID : %2d | ", id+1);
 			//printf("R : %d | ", r);
-			printf("TIME : %d:%d:%2d | ", 
+			printf("TIME : %d:%2d:%2d | ", 
 			tm_ptr->tm_hour, tm_ptr->tm_min, tm_ptr->tm_sec);
 			printf("Count : %d\n", ++a_tid[id]);
+
 			sem_post(&bin_sem);
 			sleep(r);
 		}
 		else	sem_post(&bin_sem);
-		if(a_tid[id] == 20)
+		if(a_tid[id] == 3)
 		{
 			printf("Thread %2d is Finished\n", id+1);
 			pthread_exit(NULL);
