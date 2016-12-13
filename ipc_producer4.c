@@ -28,7 +28,7 @@ int main()
 	struct sockaddr_un consumer_addr;
 	struct my_msg_st some_data;
 
-	char buff_snd[BUFF_SIZE+5];
+	char buff_snd[BUFF_SIZE];
 
 	char p_pid[20];
 	char c_pid[20];
@@ -41,7 +41,7 @@ int main()
 		if(!strcmp("start", input))	break;
 		else				printf("Please input <start>\n");
 	}
-	// 1. Start¸¦ ÀÔ·Â ¹ŞÀ¸¸é ½ÃÀÛÇÑ
+	// 1. Startë¥¼ ì…ë ¥ ë°›ìœ¼ë©´ ì‹œì‘í•œ
 
 	unlink(SOCK_PATH);
 	producer_socket = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -51,32 +51,32 @@ int main()
 	}
 	memset(&producer_addr, 0, sizeof(producer_addr));
 	producer_addr.sun_family= AF_UNIX;
-	// 1. domain : ÁÖ¼Ò ÆĞ¹Ğ¸®¸¦ ÁöÁ¤.
-	//    AF_UNIX : À¯´Ğ½º¿Í ¸®´ª½º ÆÄÀÏ ½Ã½ºÅÛÀ¸·Î ±¸ÇöµÇ´Â ·ÎÄÃ ¼ÒÄÏÀ» À§ÇØ »ç¿ë
-	// 2. type : ÀÌ ¼ÒÄÏÀ¸·Î »ç¿ëÇÒ Åë½ÅÀÇ Çü½ÄÀ» ÁöÁ¤
-	// 3. protocol : »ç¿ëÇÒ ÇÁ·ÎÅäÄİÀ» ÁöÁ¤
+	// 1. domain : ì£¼ì†Œ íŒ¨ë°€ë¦¬ë¥¼ ì§€ì •.
+	//    AF_UNIX : ìœ ë‹‰ìŠ¤ì™€ ë¦¬ëˆ…ìŠ¤ íŒŒì¼ ì‹œìŠ¤í…œìœ¼ë¡œ êµ¬í˜„ë˜ëŠ” ë¡œì»¬ ì†Œì¼“ì„ ìœ„í•´ ì‚¬ìš©
+	// 2. type : ì´ ì†Œì¼“ìœ¼ë¡œ ì‚¬ìš©í•  í†µì‹ ì˜ í˜•ì‹ì„ ì§€ì •
+	// 3. protocol : ì‚¬ìš©í•  í”„ë¡œí† ì½œì„ ì§€ì •
 
 	strcpy(producer_addr.sun_path,SOCK_PATH);
 
-	// AF_UNIX ¼ÒÄÏ¿¡ ´ëÇØ¼­ sockaddr_un ±¸Á¶Ã¼·Î ÁÖ¼Ò¸¦ ¼³¸í.
+	// AF_UNIX ì†Œì¼“ì— ëŒ€í•´ì„œ sockaddr_un êµ¬ì¡°ì²´ë¡œ ì£¼ì†Œë¥¼ ì„¤ëª….
 	// sa_family_t	sun_family : AF_UNIX
-	// char		sun_path[] : °æ·Î ÀÌ¸§	
+	// char		sun_path[] : ê²½ë¡œ ì´ë¦„	
 	if(bind(producer_socket, (struct sockaddr*)&producer_addr, 
 					sizeof(producer_addr)) == -1){
-		fprintf(stderr, "bind() ½ÇÇà ¿¡·¯\n");
+		fprintf(stderr, "bind() ì‹¤í–‰ ì—ëŸ¬\n");
 		exit(EXIT_FAILURE);
 	}
 
 	if(listen(producer_socket, 5) == -1){
-		fprintf(stderr,  "listen() ½ÇÇà ½ÇÆĞ\n");
+		fprintf(stderr,  "listen() ì‹¤í–‰ ì‹¤íŒ¨\n");
 		exit(EXIT_FAILURE);
    	}
-	// ¼ÒÄÏ¿¡ µé¾î¿À´Â ¿¬°áÀ» Çã¿ëÇÏ±â À§ÇØ 
-	// ¼­¹ö ÇÁ·Î±×·¥ÀÌ º¸·ùµÈ ¿äÃ»À» ÀúÀåÇÏ±â À§ÇÑ ´ë±â¿­À» »ı¼º.
+	// ì†Œì¼“ì— ë“¤ì–´ì˜¤ëŠ” ì—°ê²°ì„ í—ˆìš©í•˜ê¸° ìœ„í•´ 
+	// ì„œë²„ í”„ë¡œê·¸ë¨ì´ ë³´ë¥˜ëœ ìš”ì²­ì„ ì €ì¥í•˜ê¸° ìœ„í•œ ëŒ€ê¸°ì—´ì„ ìƒì„±.
 
-	// ´ë±â¿­ÀÌ ÃëÇÒ ¼ö ÀÖ´Â º¸·ù ¿¬°áÀÇ ÃÖ´ë °³¼ö¸¦ Á¦ÇÑÇÏ°í (=backlog)
-	// ´ë±â¿­ÀÇ ±æÀÌ Á¦ÇÑ¿¡ µµ´ŞÇÒ ¶§±îÁö µé¾î¿À´Â ¿¬°áÀº ¼ÒÄÏ¿¡ º¸·ùµÈ »óÅÂ°¡ µÊ
-	// ±× ÀÌ»óÀÇ ¿¬°áÀº °ÅºÎÇÏ°í Å¬¶óÀÌ¾ğÆ®ÀÇ ¿¬°áÀº ½ÇÆĞ.
+	// ëŒ€ê¸°ì—´ì´ ì·¨í•  ìˆ˜ ìˆëŠ” ë³´ë¥˜ ì—°ê²°ì˜ ìµœëŒ€ ê°œìˆ˜ë¥¼ ì œí•œí•˜ê³  (=backlog)
+	// ëŒ€ê¸°ì—´ì˜ ê¸¸ì´ ì œí•œì— ë„ë‹¬í•  ë•Œê¹Œì§€ ë“¤ì–´ì˜¤ëŠ” ì—°ê²°ì€ ì†Œì¼“ì— ë³´ë¥˜ëœ ìƒíƒœê°€ ë¨
+	// ê·¸ ì´ìƒì˜ ì—°ê²°ì€ ê±°ë¶€í•˜ê³  í´ë¼ì´ì–¸íŠ¸ì˜ ì—°ê²°ì€ ì‹¤íŒ¨.
 
 	pid = fork();
 	if(pid == -1){
@@ -85,7 +85,7 @@ int main()
 	}
 	else if(pid == 0)
 		execl("./ipc_consumer4", "ipc_consumer4", NULL);  
-	// ÀÚ½Ä »ı¼º
+	// ìì‹ ìƒì„±
 
 	
 	some_data.student_num = 2014136142;
@@ -97,8 +97,8 @@ int main()
 	consumer_size = sizeof(consumer_addr);
 	consumer_socket = accept(producer_socket,
 		(struct sockaddr*)&consumer_addr, &consumer_size);
-	// ¼ÒÄÏÀÇ ´ë±â¿­¿¡¼­ ±â´Ù¸®°í ÀÖ´ø º¸·ù ¿¬°á.
-	// Åë½ÅÇÏ±â À§ÇØ »õ·Î¿î ¼ÒÄÏÀ» ¸¸µé°í ÀÌ°ÍÀÇ ¼³¸íÀÚ¸¦ ¹İÈ¯ÇÑ´Ù.
+	// ì†Œì¼“ì˜ ëŒ€ê¸°ì—´ì—ì„œ ê¸°ë‹¤ë¦¬ê³  ìˆë˜ ë³´ë¥˜ ì—°ê²°.
+	// í†µì‹ í•˜ê¸° ìœ„í•´ ìƒˆë¡œìš´ ì†Œì¼“ì„ ë§Œë“¤ê³  ì´ê²ƒì˜ ì„¤ëª…ìë¥¼ ë°˜í™˜í•œë‹¤.
 		
 	if (consumer_socket == -1){
 		fprintf(stderr, "Failed to connect\n");
@@ -121,7 +121,7 @@ int main()
 	printf("Consumer PID : %d\n", some_data.c_pid); 
 	printf("Student Number : %d\n", some_data.student_num);
 	printf("Student Name : %s\n", some_data.name);
-	// 4. Àü´Ş¹ŞÀº µ¥ÀÌÅÍ¸¦ Ãâ·ÂÇÑ´Ù.	      
+	// 4. ì „ë‹¬ë°›ì€ ë°ì´í„°ë¥¼ ì¶œë ¥í•œë‹¤.	      
 
 	close(consumer_socket);
 	exit(EXIT_SUCCESS);
