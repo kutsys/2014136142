@@ -368,7 +368,7 @@ void print_Section32_Header(FILE* fp, Elf32_Ehdr ehdr)
 		fseek(fp, ehdr.e_shoff + i*ehdr.e_shentsize, SEEK_SET);
 		fread(&elfShdr, 1, ehdr.e_shentsize, fp);
 
-		printf("[%-3d]", i);
+		printf("[%-2d] ", i);
 		printf("%-16s ", (string_table+elfShdr.sh_name));
 		memset(section_type, 0, sizeof(section_type));
 		switch(elfShdr.sh_type){
@@ -453,6 +453,7 @@ void print_Section32_Header(FILE* fp, Elf32_Ehdr ehdr)
 		printf("%-6x ", elfShdr.sh_link);
 		printf("%-6x ", elfShdr.sh_info);
 		printf("%-6u ", elfShdr.sh_addralign);
+		printf("\n");
 		printf("\n");
 		if(++i == ehdr.e_shnum) {
 		printf("Key to Flags:\n");
@@ -744,7 +745,7 @@ void print_Section64_Header(FILE* fp, Elf64_Ehdr ehdr)
 		fseek(fp, ehdr.e_shoff + i*ehdr.e_shentsize, SEEK_SET);
 		fread(&elfShdr, 1, ehdr.e_shentsize, fp);
 
-		printf(" [%-3d]", i);
+		printf(" [%-2d] ", i);
 		printf("%-18s ", (string_table+elfShdr.sh_name));
 		memset(section_type, 0, sizeof(section_type));
 		switch(elfShdr.sh_type){
