@@ -454,7 +454,6 @@ void print_Section32_Header(FILE* fp, Elf32_Ehdr ehdr)
 		printf("%-6x ", elfShdr.sh_info);
 		printf("%-6u ", elfShdr.sh_addralign);
 		printf("\n");
-		printf("\n");
 		if(++i == ehdr.e_shnum) {
 		printf("Key to Flags:\n");
 		printf("  W (write), A (alloc), X (execute), M (merge),");
@@ -830,7 +829,6 @@ void print_Section64_Header(FILE* fp, Elf64_Ehdr ehdr)
 		printf("%-6x ", elfShdr.sh_link);
 		printf("%-6x ", elfShdr.sh_info);
 		printf("%-6lu ", elfShdr.sh_addralign);
-		printf("\n");
 		printf("\n");
 		if(++i == ehdr.e_shnum) {
 		printf("Key to Flags:\n");
