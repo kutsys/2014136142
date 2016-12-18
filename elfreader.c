@@ -9,6 +9,10 @@
 #define OPT_SEC_HEADER 		0x2
 #define OPT_PRO_HEADER 		0x4
 
+#define GNU_EH_FRAME 0x6474e550
+#define GNU_STACK 0x6474e551
+#define GNU_RELRO 0x6474e552
+
 #define MAX_PATH 256
 #define TRUE 1
 #define FALSE 0
@@ -272,8 +276,8 @@ void print_Program32_Header(FILE *fp, Elf32_Ehdr ehdr)
 
 	fseek(fp, ehdr.e_phoff, SEEK_SET);
 	printf("%-16s %-18s %-18s %-18s\n", "Type", "Offset", "VirtualAddr", "PhysicalAddr");
-	printf("%-18s %-18s %-8s %7s\n", "FileSize", "MemorySize", "Flags", "Align" );
-
+	printf("%25s %20s %13s %7s\n", "FileSize", "MemorySize", "Flags", "Align" );
+	int flag = 0;
 	int i = 0;
 	while(1){
 		fread(&elfPhdr, 1, ehdr.e_phentsize, fp);
@@ -315,19 +319,29 @@ void print_Program32_Header(FILE *fp, Elf32_Ehdr ehdr)
 		case PT_HIPROC:
 			strcpy(program_type, "HIPROC");
 			break;
+		case GNU_EH_FRAME:
+			strcpy(program_type, "GNU_EH_FRAME");
+			break;
+		case GNU_STACK:
+			strcpy(program_type, "GNU_STACK");
+			break;
+		case GNU_RELRO:
+			strcpy(program_type, "GNU_RELRO");
+			flag = 1;
+			break;
 		}
 		printf("%-16s ", program_type);
 		printf("0x%016x ", elfPhdr.p_offset);
 		printf("0x%016x ", elfPhdr.p_vaddr);
 		printf("0x%016x ", elfPhdr.p_paddr);
-		printf("\n");
+		printf("\n                 ");
 
 		printf("0x%016x ", elfPhdr.p_filesz);
 		printf("0x%016x ", elfPhdr.p_memsz);
-		printf("%-8x ", elfPhdr.p_flags);
+		printf("%2x ", elfPhdr.p_flags);
 		printf("%7x ", elfPhdr.p_align);
 		printf("\n\n");
-		if(++i == ehdr.e_shnum) break;
+		if(++i == ehdr.e_shnum || flag == 1) {flag = 0; break;}
 	}
 }
 
@@ -435,13 +449,21 @@ void print_Section32_Header(FILE* fp, Elf32_Ehdr ehdr)
 
 		printf("0x%016u ", elfShdr.sh_size);
 		printf("0x%016u ", elfShdr.sh_entsize);
-		printf("%7u ", elfShdr.sh_flags);
+		printf("%-6u ", elfShdr.sh_flags);
 		printf("%-6x ", elfShdr.sh_link);
 		printf("%-6x ", elfShdr.sh_info);
 		printf("%-6u ", elfShdr.sh_addralign);
 		printf("\n");
 		printf("\n");
-		if(++i == ehdr.e_shnum) break;
+		if(++i == ehdr.e_shnum) {
+		printf("Key to Flags:\n");
+		printf("  W (write), A (alloc), X (execute), M (merge),");
+		printf(" S (strings), l (large)\n");
+		printf("  I (info), L (link order), G (group), T (TLS),");
+		printf(" E (exclude), x (unknown)\n");
+		printf("  O (extra OS processing required) o (OS specific)");
+		printf(",p (processor specific)\n");
+		break;	}
 	}
 }
 
@@ -632,8 +654,8 @@ void print_Program64_Header(FILE *fp, Elf64_Ehdr ehdr)
 
 	fseek(fp, ehdr.e_phoff, SEEK_SET);
 	printf("%-16s %-18s %-18s %-18s\n", "Type", "Offset", "VirtualAddr", "PhysicalAddr");
-	printf("%-18s %-18s %-8s %7s\n", "FileSize", "MemorySize", "Flags", "Align" );
-
+	printf("%25s %20s %13s %7s\n", "FileSize", "MemorySize", "Flags", "Align" );
+	int flag = 0;
 	int i = 0;
 	while(1){
 		fread(&elfPhdr, 1, ehdr.e_phentsize, fp);
@@ -675,19 +697,29 @@ void print_Program64_Header(FILE *fp, Elf64_Ehdr ehdr)
 		case PT_HIPROC:
 			strcpy(program_type, "HIPROC");
 			break;
+		case GNU_EH_FRAME:
+			strcpy(program_type, "GNU_EH_FRAME");
+			break;
+		case GNU_STACK:
+			strcpy(program_type, "GNU_STACK");
+			break;
+		case GNU_RELRO:
+			strcpy(program_type, "GNU_RELRO");
+			flag = 1;
+			break;
 		}
 		printf("%-16s ", program_type);
 		printf("0x%016lx ", elfPhdr.p_offset);
 		printf("0x%016lx ", elfPhdr.p_vaddr);
 		printf("0x%016lx ", elfPhdr.p_paddr);
-		printf("\n");
+		printf("\n                 ");
 
 		printf("0x%016lx ", elfPhdr.p_filesz);
 		printf("0x%016lx ", elfPhdr.p_memsz);
-		printf("%-8x ", elfPhdr.p_flags);
+		printf("%2x ", elfPhdr.p_flags);
 		printf("%7lx ", elfPhdr.p_align);
 		printf("\n\n");
-		if(++i == ehdr.e_shnum) break;
+		if(++i == ehdr.e_shnum || flag == 1) {flag = 0; break;}
 	}
 }
 void print_Section64_Header(FILE* fp, Elf64_Ehdr ehdr)
@@ -695,6 +727,7 @@ void print_Section64_Header(FILE* fp, Elf64_Ehdr ehdr)
 	char *string_table;
 	char section_type[16];
 	Elf64_Shdr elfShdr;
+	// read string table
 
 	fseek(fp, ehdr.e_shoff + ehdr.e_shstrndx * sizeof(elfShdr), SEEK_SET);
 	fread(&elfShdr, 1, sizeof(elfShdr), fp);
@@ -703,16 +736,17 @@ void print_Section64_Header(FILE* fp, Elf64_Ehdr ehdr)
 	fseek(fp, elfShdr.sh_offset, SEEK_SET);
 	fread(string_table, 1, elfShdr.sh_size, fp);
 
-	printf("[%-3s] %-16s %-18s %-18s %-10s\n", "NUM", "Name", "Type", "Address", "offset");
-	printf("      %-18s %-18s %7s %-6s %-6s %-6s\n", "Size", "EntSize", "Flags", "Link", "Info", "Align");
+	printf(" [Nr] %-18s %-18s %-18s %-10s\n", "Name", "Type", "Address", "offset");
+	printf("      %-18s %-18s %5s %-6s %-6s %-6s\n", "Size", "EntSize", "Flags", "Link", "Info", "Align");
+	// read all section headers and print it
 
 	int i=0;
 	while(1){
 		fseek(fp, ehdr.e_shoff + i*ehdr.e_shentsize, SEEK_SET);
 		fread(&elfShdr, 1, ehdr.e_shentsize, fp);
 
-		printf("[%-3d]", i);
-		printf("%-16s ", (string_table+elfShdr.sh_name));
+		printf(" [%-3d]", i);
+		printf("%-18s ", (string_table+elfShdr.sh_name));
 		memset(section_type, 0, sizeof(section_type));
 		switch(elfShdr.sh_type){
 		case SHT_NULL:
@@ -792,13 +826,21 @@ void print_Section64_Header(FILE* fp, Elf64_Ehdr ehdr)
 
 		printf("0x%016lu ", elfShdr.sh_size);
 		printf("0x%016lu ", elfShdr.sh_entsize);
-		printf("%7lu ", elfShdr.sh_flags);
+		printf("%-6lu ", elfShdr.sh_flags);
 		printf("%-6x ", elfShdr.sh_link);
 		printf("%-6x ", elfShdr.sh_info);
 		printf("%-6lu ", elfShdr.sh_addralign);
 		printf("\n");
 		printf("\n");
-		if(++i == ehdr.e_shnum) break;
+		if(++i == ehdr.e_shnum) {
+		printf("Key to Flags:\n");
+		printf("  W (write), A (alloc), X (execute), M (merge),");
+		printf(" S (strings), l (large)\n");
+		printf("  I (info), L (link order), G (group), T (TLS),");
+		printf(" E (exclude), x (unknown)\n");
+		printf("  O (extra OS processing required) o (OS specific)");
+		printf(",p (processor specific)\n");
+		break;}
 	}
 }
 
